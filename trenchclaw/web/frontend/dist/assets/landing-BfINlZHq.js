@@ -1,1 +1,0 @@
-import{j as e}from"./index-B_Hu4Ff2.js";function a(){return e.jsx("div",{className:"h-dvh w-full overflow-hidden bg-white",children:e.jsx("iframe",{title:"TrenchLaw landing page",src:"/trenchlaw-landing.html",className:"block h-full w-full border-0"})})}export{a as component};

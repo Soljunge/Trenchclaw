@@ -19,6 +19,7 @@ import { Route as ChannelsRouteRouteImport } from './routes/channels/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ConfigRawRouteImport } from './routes/config.raw'
 import { Route as ChannelsNameRouteImport } from './routes/channels/$name'
+import { Route as AgentVisualaRouteImport } from './routes/agent/visuala'
 import { Route as AgentToolsRouteImport } from './routes/agent/tools'
 import { Route as AgentSkillsRouteImport } from './routes/agent/skills'
 
@@ -72,6 +73,11 @@ const ChannelsNameRoute = ChannelsNameRouteImport.update({
   path: '/$name',
   getParentRoute: () => ChannelsRouteRoute,
 } as any)
+const AgentVisualaRoute = AgentVisualaRouteImport.update({
+  id: '/visuala',
+  path: '/visuala',
+  getParentRoute: () => AgentRoute,
+} as any)
 const AgentToolsRoute = AgentToolsRouteImport.update({
   id: '/tools',
   path: '/tools',
@@ -94,6 +100,7 @@ export interface FileRoutesByFullPath {
   '/models': typeof ModelsRoute
   '/agent/skills': typeof AgentSkillsRoute
   '/agent/tools': typeof AgentToolsRoute
+  '/agent/visuala': typeof AgentVisualaRoute
   '/channels/$name': typeof ChannelsNameRoute
   '/config/raw': typeof ConfigRawRoute
 }
@@ -108,6 +115,7 @@ export interface FileRoutesByTo {
   '/models': typeof ModelsRoute
   '/agent/skills': typeof AgentSkillsRoute
   '/agent/tools': typeof AgentToolsRoute
+  '/agent/visuala': typeof AgentVisualaRoute
   '/channels/$name': typeof ChannelsNameRoute
   '/config/raw': typeof ConfigRawRoute
 }
@@ -123,6 +131,7 @@ export interface FileRoutesById {
   '/models': typeof ModelsRoute
   '/agent/skills': typeof AgentSkillsRoute
   '/agent/tools': typeof AgentToolsRoute
+  '/agent/visuala': typeof AgentVisualaRoute
   '/channels/$name': typeof ChannelsNameRoute
   '/config/raw': typeof ConfigRawRoute
 }
@@ -139,6 +148,7 @@ export interface FileRouteTypes {
     | '/models'
     | '/agent/skills'
     | '/agent/tools'
+    | '/agent/visuala'
     | '/channels/$name'
     | '/config/raw'
   fileRoutesByTo: FileRoutesByTo
@@ -153,6 +163,7 @@ export interface FileRouteTypes {
     | '/models'
     | '/agent/skills'
     | '/agent/tools'
+    | '/agent/visuala'
     | '/channels/$name'
     | '/config/raw'
   id:
@@ -167,6 +178,7 @@ export interface FileRouteTypes {
     | '/models'
     | '/agent/skills'
     | '/agent/tools'
+    | '/agent/visuala'
     | '/channels/$name'
     | '/config/raw'
   fileRoutesById: FileRoutesById
@@ -254,6 +266,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChannelsNameRouteImport
       parentRoute: typeof ChannelsRouteRoute
     }
+    '/agent/visuala': {
+      id: '/agent/visuala'
+      path: '/visuala'
+      fullPath: '/agent/visuala'
+      preLoaderRoute: typeof AgentVisualaRouteImport
+      parentRoute: typeof AgentRoute
+    }
     '/agent/tools': {
       id: '/agent/tools'
       path: '/tools'
@@ -286,11 +305,13 @@ const ChannelsRouteRouteWithChildren = ChannelsRouteRoute._addFileChildren(
 interface AgentRouteChildren {
   AgentSkillsRoute: typeof AgentSkillsRoute
   AgentToolsRoute: typeof AgentToolsRoute
+  AgentVisualaRoute: typeof AgentVisualaRoute
 }
 
 const AgentRouteChildren: AgentRouteChildren = {
   AgentSkillsRoute: AgentSkillsRoute,
   AgentToolsRoute: AgentToolsRoute,
+  AgentVisualaRoute: AgentVisualaRoute,
 }
 
 const AgentRouteWithChildren = AgentRoute._addFileChildren(AgentRouteChildren)

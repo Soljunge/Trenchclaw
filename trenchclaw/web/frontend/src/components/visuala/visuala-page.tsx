@@ -1,0 +1,312 @@
+import {
+  IconBrain,
+  IconClockHour4,
+  IconPlayerPause,
+  IconPlugConnected,
+  IconTerminal2,
+} from "@tabler/icons-react"
+import type { ComponentType } from "react"
+import { useTranslation } from "react-i18next"
+
+import { PageHeader } from "@/components/page-header"
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { useGateway } from "@/hooks/use-gateway"
+import { useGatewayLogs } from "@/hooks/use-gateway-logs"
+import { cn } from "@/lib/utils"
+
+type ActivityTone = "thinking" | "tool" | "io" | "idle"
+
+interface ActivityItem {
+  id: string
+  label: string
+  detail: string
+  tone: ActivityTone
+  Icon: ComponentType<{ className?: string }>
+}
+
+const MAX_EVENTS = 12
+
+export function VisualaPage() {
+  const { t } = useTranslation()
+  const { state } = useGateway()
+  const { logs } = useGatewayLogs()
+
+  const recentLogs = logs.slice(-MAX_EVENTS).reverse()
+  const visualEvents = recentLogs.map((line, index) =>
+    createActivityItem(line, `${logs.length - index}`),
+  )
+
+  const metrics = summarizeLogs(logs, state)
+
+  return (
+    <div className="flex h-full flex-col">
+      <PageHeader title={t("navigation.visuala")} />
+
+      <div className="flex-1 overflow-auto px-6 py-3">
+        <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 pb-8">
+          <Card className="border border-border/60" size="sm">
+            <CardHeader>
+              <CardTitle>{t("pages.agent.visuala.hero_title")}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-3 md:grid-cols-4">
+                <SimpleBox
+                  label={t("pages.agent.visuala.metrics.gateway")}
+                  value={t(`pages.agent.visuala.gateway_state.${state}`)}
+                />
+                <SimpleBox
+                  label={t("pages.agent.visuala.metrics.phase")}
+                  value={t(`pages.agent.visuala.phase.${metrics.phase}`)}
+                />
+                <SimpleBox
+                  label={t("pages.agent.visuala.cards.thinking")}
+                  value={String(metrics.thinkingCount)}
+                />
+                <SimpleBox
+                  label={t("pages.agent.visuala.cards.tools")}
+                  value={String(metrics.toolCount)}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="flex justify-center">
+            <div className="bg-border h-8 w-px" />
+          </div>
+
+          <div className="grid gap-6 lg:grid-cols-[220px_minmax(0,1fr)]">
+            <div className="space-y-4">
+              <SimpleFlowBox
+                title={t("pages.agent.visuala.now_title")}
+                value={t(`pages.agent.visuala.phase.${metrics.phase}`)}
+                tone={metrics.phaseTone}
+              />
+              <div className="flex justify-center">
+                <div className="bg-border h-10 w-px" />
+              </div>
+              <SimpleFlowBox
+                title={t("pages.agent.visuala.cards.io")}
+                value={String(metrics.ioCount)}
+                tone="io"
+              />
+            </div>
+
+            <Card className="border border-border/60" size="sm">
+              <CardHeader>
+                <CardTitle>{t("pages.agent.visuala.timeline_title")}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {visualEvents.length > 0 ? (
+                  <div className="space-y-0">
+                    {visualEvents.map((event, index) => (
+                      <div key={event.id} className="relative pl-8">
+                        {index < visualEvents.length - 1 ? (
+                          <div className="bg-border absolute top-8 left-3 h-[calc(100%+0.5rem)] w-px" />
+                        ) : null}
+                        <div className="bg-background absolute top-3 left-0 flex size-6 items-center justify-center border border-border">
+                          <event.Icon className="size-3.5" />
+                        </div>
+                        <div
+                          className={cn(
+                            "mb-3 border px-3 py-3",
+                            boxToneClasses[event.tone],
+                          )}
+                        >
+                          <div className="text-sm font-medium">
+                            {event.label}
+                          </div>
+                          <div className="mt-1 font-mono text-xs break-words opacity-80">
+                            {event.detail}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <EmptyState text={t("pages.agent.visuala.empty")} />
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function SimpleBox({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="border border-border px-3 py-3">
+      <div className="text-muted-foreground text-[11px] uppercase tracking-[0.18em]">
+        {label}
+      </div>
+      <div className="mt-2 text-base font-medium">{value}</div>
+    </div>
+  )
+}
+
+function SimpleFlowBox({
+  title,
+  value,
+  tone,
+}: {
+  title: string
+  value: string
+  tone: ActivityTone
+}) {
+  return (
+    <div
+      className={cn(
+        "border px-4 py-4 text-center",
+        boxToneClasses[tone],
+      )}
+    >
+      <div className="text-xs uppercase tracking-[0.18em] opacity-70">
+        {title}
+      </div>
+      <div className="mt-2 text-sm font-medium">{value}</div>
+    </div>
+  )
+}
+
+function EmptyState({ text }: { text: string }) {
+  return (
+    <div className="text-muted-foreground rounded-xl border border-dashed px-4 py-8 text-center text-sm">
+      {text}
+    </div>
+  )
+}
+
+const boxToneClasses: Record<ActivityTone, string> = {
+  thinking: "border-violet-300 bg-violet-50 text-violet-900",
+  tool: "border-emerald-300 bg-emerald-50 text-emerald-900",
+  io: "border-sky-300 bg-sky-50 text-sky-900",
+  idle: "border-border bg-background text-foreground",
+}
+
+function createActivityItem(line: string, id: string): ActivityItem {
+  const lower = line.toLowerCase()
+
+  if (
+    lower.includes("tool") ||
+    lower.includes("exec") ||
+    lower.includes("command") ||
+    lower.includes("mcp")
+  ) {
+    return {
+      id,
+      label: "Tool execution",
+      detail: line,
+      tone: "tool",
+      Icon: IconTerminal2,
+    }
+  }
+
+  if (
+    lower.includes("thinking") ||
+    lower.includes("reason") ||
+    lower.includes("model") ||
+    lower.includes("assistant")
+  ) {
+    return {
+      id,
+      label: "Reasoning",
+      detail: line,
+      tone: "thinking",
+      Icon: IconBrain,
+    }
+  }
+
+  if (
+    lower.includes("session") ||
+    lower.includes("connect") ||
+    lower.includes("channel") ||
+    lower.includes("message")
+  ) {
+    return {
+      id,
+      label: "I/O activity",
+      detail: line,
+      tone: "io",
+      Icon: IconPlugConnected,
+    }
+  }
+
+  return {
+    id,
+    label: "Background activity",
+    detail: line,
+    tone: "idle",
+    Icon: IconClockHour4,
+  }
+}
+
+function summarizeLogs(logs: string[], gatewayState: string) {
+  const thinkingCount = countMatches(logs, [
+    "thinking",
+    "reason",
+    "assistant",
+    "model",
+  ])
+  const toolCount = countMatches(logs, ["tool", "exec", "command", "mcp"])
+  const ioCount = countMatches(logs, [
+    "message",
+    "session",
+    "channel",
+    "connect",
+  ])
+
+  const latest = logs[logs.length - 1]
+  const latestEvent = latest
+    ? createActivityItem(latest, "latest")
+    : {
+        tone: "idle" as ActivityTone,
+        label: "Idle",
+        detail: "",
+        Icon: IconPlayerPause,
+      }
+
+  let phase: "booting" | "thinking" | "acting" | "waiting" = "waiting"
+  let phaseTone: ActivityTone = "idle"
+
+  if (gatewayState === "starting" || gatewayState === "restarting") {
+    phase = "booting"
+    phaseTone = "io"
+  } else if (latestEvent.tone === "thinking") {
+    phase = "thinking"
+    phaseTone = "thinking"
+  } else if (latestEvent.tone === "tool") {
+    phase = "acting"
+    phaseTone = "tool"
+  } else if (latestEvent.tone === "io") {
+    phase = "booting"
+    phaseTone = "io"
+  }
+
+  const summary = latest
+    ? latest
+    : "No live gateway activity has been captured yet."
+
+  return {
+    thinkingCount,
+    toolCount,
+    ioCount,
+    phase,
+    phaseTone,
+    summary,
+  }
+}
+
+function countMatches(lines: string[], patterns: string[]) {
+  return lines.reduce((count, line) => {
+    const lower = line.toLowerCase()
+    return patterns.some((pattern) => lower.includes(pattern))
+      ? count + 1
+      : count
+  }, 0)
+}

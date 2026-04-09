@@ -7,6 +7,7 @@
     "agent_group": "Agent",
     "skills": "Skills",
     "tools": "Tools",
+    "visuala": "Visuala",
     "services": "Services",
     "channels_group": "Channels",
     "show_more_channels": "More",
@@ -390,6 +391,46 @@
           "requires_skills": "Enable `tools.skills` before this skill-registry tool can be used.",
           "requires_subagent": "Enable `tools.subagent` before the spawn tool can delegate work.",
           "requires_mcp_discovery": "Enable `tools.mcp.discovery` before MCP discovery tools become available."
+        }
+      },
+      "visuala": {
+        "hero_title": "Visuala agent activity",
+        "hero_description": "A live visual board built from gateway activity so users can see what the agent is doing right now.",
+        "now_title": "Current focus",
+        "now_description": "The latest signal from the running agent loop.",
+        "timeline_title": "Recent timeline",
+        "timeline_description": "Newest activity appears first and updates as the gateway emits new logs.",
+        "raw_title": "Raw feed",
+        "raw_description": "The last captured gateway log lines behind the visual summary.",
+        "empty": "No recent activity yet. Start the gateway and send a task to see the agent move.",
+        "raw_empty": "No raw logs captured yet.",
+        "metrics": {
+          "gateway": "Gateway",
+          "phase": "Phase",
+          "events": "Events"
+        },
+        "cards": {
+          "thinking": "Thinking",
+          "thinking_description": "Log lines that suggest the model is reasoning or composing.",
+          "tools": "Tool actions",
+          "tools_description": "Log lines related to tools, commands, or MCP operations.",
+          "io": "I/O activity",
+          "io_description": "Messages, sessions, channels, and connection events."
+        },
+        "phase": {
+          "booting": "Connecting",
+          "thinking": "Thinking",
+          "acting": "Acting",
+          "waiting": "Waiting"
+        },
+        "gateway_state": {
+          "running": "Running",
+          "starting": "Starting",
+          "restarting": "Restarting",
+          "stopping": "Stopping",
+          "stopped": "Stopped",
+          "error": "Error",
+          "unknown": "Unknown"
         }
       }
     },
