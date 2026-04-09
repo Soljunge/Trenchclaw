@@ -3,12 +3,13 @@ import {
   IconLoader2,
   IconMenu2,
   IconMoon,
+  IconPencil,
   IconPlayerPlay,
   IconPower,
   IconRefresh,
   IconSun,
 } from "@tabler/icons-react"
-import { Link } from "@tanstack/react-router"
+import { Link, useRouterState } from "@tanstack/react-router"
 import * as React from "react"
 import { useTranslation } from "react-i18next"
 import {
@@ -34,6 +35,9 @@ import { useTheme } from "@/hooks/use-theme.ts"
 
 export function AppHeader() {
   const { t } = useTranslation()
+  const pathname = useRouterState({
+    select: (state) => state.location.pathname,
+  })
   const { theme, toggleTheme } = useTheme()
   const {
     state: gwState,
@@ -57,6 +61,7 @@ export function AppHeader() {
     (gwState === "stopped" || gwState === "error")
 
   const [showStopDialog, setShowStopDialog] = React.useState(false)
+  const isVisualaPage = pathname === "/agent/visuala"
 
   const handleGatewayToggle = () => {
     if (gwLoading || isRestarting || isStopping || (!isRunning && !canStart)) {
@@ -77,6 +82,10 @@ export function AppHeader() {
   const confirmStop = () => {
     setShowStopDialog(false)
     stop()
+  }
+
+  const handleToggleVisualaCustomize = () => {
+    window.dispatchEvent(new Event("visuala:toggle-customize"))
   }
 
   return (
@@ -208,6 +217,18 @@ export function AppHeader() {
             <IconBook className="size-4.5" />
           </a>
         </Button>
+
+        {isVisualaPage ? (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-8"
+            onClick={handleToggleVisualaCustomize}
+            aria-label="Customize Visuala"
+          >
+            <IconPencil className="size-4.5" />
+          </Button>
+        ) : null}
 
         {/* Theme Toggle */}
         <Button

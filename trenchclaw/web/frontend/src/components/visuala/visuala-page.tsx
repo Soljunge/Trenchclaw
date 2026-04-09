@@ -6,7 +6,7 @@ import {
   IconTerminal2,
 } from "@tabler/icons-react"
 import type { ComponentType } from "react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { PageHeader } from "@/components/page-header"
@@ -43,6 +43,7 @@ export function VisualaPage() {
   const [showThinking, setShowThinking] = useState(true)
   const [showTools, setShowTools] = useState(true)
   const [showMemory, setShowMemory] = useState(true)
+  const [showCustomize, setShowCustomize] = useState(false)
 
   const recentLogs = logs.slice(-MAX_EVENTS).reverse()
   const visualEvents = recentLogs.map((line, index) =>
@@ -51,51 +52,64 @@ export function VisualaPage() {
 
   const metrics = summarizeLogs(logs, state)
 
+  useEffect(() => {
+    const handleToggle = () => {
+      setShowCustomize((prev) => !prev)
+    }
+
+    window.addEventListener("visuala:toggle-customize", handleToggle)
+    return () => {
+      window.removeEventListener("visuala:toggle-customize", handleToggle)
+    }
+  }, [])
+
   return (
     <div className="flex h-full flex-col">
       <PageHeader title={t("navigation.visuala")} />
 
       <div className="flex-1 overflow-auto px-6 py-3">
         <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 pb-8">
-          <Card className="border border-border/60" size="sm">
-            <CardHeader>
-              <CardTitle>{t("pages.agent.visuala.customize_title")}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-3 md:grid-cols-3">
-                <ToggleRow
-                  label={t("pages.agent.visuala.customize.summary")}
-                  checked={showSummary}
-                  onCheckedChange={setShowSummary}
-                />
-                <ToggleRow
-                  label={t("pages.agent.visuala.customize.flow")}
-                  checked={showFlow}
-                  onCheckedChange={setShowFlow}
-                />
-                <ToggleRow
-                  label={t("pages.agent.visuala.customize.timeline")}
-                  checked={showTimeline}
-                  onCheckedChange={setShowTimeline}
-                />
-                <ToggleRow
-                  label={t("pages.agent.visuala.cards.thinking")}
-                  checked={showThinking}
-                  onCheckedChange={setShowThinking}
-                />
-                <ToggleRow
-                  label={t("pages.agent.visuala.cards.tools")}
-                  checked={showTools}
-                  onCheckedChange={setShowTools}
-                />
-                <ToggleRow
-                  label={t("pages.agent.visuala.cards.memory")}
-                  checked={showMemory}
-                  onCheckedChange={setShowMemory}
-                />
-              </div>
-            </CardContent>
-          </Card>
+          {showCustomize ? (
+            <Card className="border border-border/60" size="sm">
+              <CardHeader>
+                <CardTitle>{t("pages.agent.visuala.customize_title")}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-3 md:grid-cols-3">
+                  <ToggleRow
+                    label={t("pages.agent.visuala.customize.summary")}
+                    checked={showSummary}
+                    onCheckedChange={setShowSummary}
+                  />
+                  <ToggleRow
+                    label={t("pages.agent.visuala.customize.flow")}
+                    checked={showFlow}
+                    onCheckedChange={setShowFlow}
+                  />
+                  <ToggleRow
+                    label={t("pages.agent.visuala.customize.timeline")}
+                    checked={showTimeline}
+                    onCheckedChange={setShowTimeline}
+                  />
+                  <ToggleRow
+                    label={t("pages.agent.visuala.cards.thinking")}
+                    checked={showThinking}
+                    onCheckedChange={setShowThinking}
+                  />
+                  <ToggleRow
+                    label={t("pages.agent.visuala.cards.tools")}
+                    checked={showTools}
+                    onCheckedChange={setShowTools}
+                  />
+                  <ToggleRow
+                    label={t("pages.agent.visuala.cards.memory")}
+                    checked={showMemory}
+                    onCheckedChange={setShowMemory}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          ) : null}
 
           {showSummary ? (
           <Card className="border border-border/60" size="sm">
