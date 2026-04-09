@@ -116,7 +116,7 @@ export function ChatPage() {
     return () => window.cancelAnimationFrame(frameId)
   }, [])
 
-  const isStable = isChatConnected && perfStats.fps >= 45 && perfStats.frameMs > 0
+  const isStable = isChatConnected
 
   const handleSend = () => {
     if (!input.trim() || !canSend) return
