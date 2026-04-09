@@ -42,6 +42,14 @@
       "localModelUnavailable": "This local model is not reachable. Make sure the local model server is running and the configured localhost port is correct.",
       "apiModelUnavailable": "This model is not accessible right now. Check the API key, provider login, network connection, or model endpoint."
     },
+    "connectionErrors": {
+      "noToken": "Chat could not start because the Jame token is missing or the channel is not configured.",
+      "socketClosed": "The chat connection was closed. TrenchClaw is trying to reconnect.",
+      "socketError": "The chat connection failed. This can happen when the gateway is up but the channel socket is not reachable yet.",
+      "connectFailed": "Failed to connect to chat.",
+      "sendUnavailable": "Your message could not be sent because chat is not connected yet.",
+      "sendFailed": "Failed to send your message."
+    },
     "empty": {
       "noConfiguredModel": "No Model Configured",
       "noConfiguredModelDescription": "You need to configure at least one AI model with an API key before you can start chatting.",

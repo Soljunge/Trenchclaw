@@ -21,6 +21,7 @@ export type ConnectionState =
 export interface ChatStoreState {
   messages: ChatMessage[]
   connectionState: ConnectionState
+  errorDetail: string
   isTyping: boolean
   activeSessionId: string
   hasHydratedActiveSession: boolean
@@ -31,6 +32,7 @@ type ChatStorePatch = Partial<ChatStoreState>
 const DEFAULT_CHAT_STATE: ChatStoreState = {
   messages: [],
   connectionState: "disconnected",
+  errorDetail: "",
   isTyping: false,
   activeSessionId: getInitialActiveSessionId(),
   hasHydratedActiveSession: false,

@@ -103,6 +103,7 @@ function disconnectChatInternal({
 
   updateChatStore({
     connectionState: "disconnected",
+    errorDetail: "",
     isTyping: false,
   })
 }
@@ -128,7 +129,7 @@ export async function connectChat() {
   connectionGeneration = generation
   isConnecting = true
   clearReconnectTimer()
-  updateChatStore({ connectionState: "connecting" })
+  updateChatStore({ connectionState: "connecting", errorDetail: "" })
 
   try {
     const { token, ws_url } = await getJameToken()
@@ -141,7 +142,10 @@ export async function connectChat() {
 
     if (!token) {
       console.error("No jame token available")
-      updateChatStore({ connectionState: "error" })
+      updateChatStore({
+        connectionState: "error",
+        errorDetail: i18n.t("chat.connectionErrors.noToken"),
+      })
       isConnecting = false
       scheduleReconnect(generation, sessionId)
       return
@@ -170,7 +174,7 @@ export async function connectChat() {
       ) {
         return
       }
-      updateChatStore({ connectionState: "connected" })
+      updateChatStore({ connectionState: "connected", errorDetail: "" })
       isConnecting = false
       reconnectAttempts = 0
     }
@@ -214,6 +218,7 @@ export async function connectChat() {
       isConnecting = false
       updateChatStore({
         connectionState: "disconnected",
+        errorDetail: i18n.t("chat.connectionErrors.socketClosed"),
         isTyping: false,
       })
       scheduleReconnect(generation, sessionId)
@@ -233,7 +238,10 @@ export async function connectChat() {
         return
       }
       isConnecting = false
-      updateChatStore({ connectionState: "error" })
+      updateChatStore({
+        connectionState: "error",
+        errorDetail: i18n.t("chat.connectionErrors.socketError"),
+      })
       scheduleReconnect(generation, sessionId)
     }
 
@@ -244,7 +252,13 @@ export async function connectChat() {
       return
     }
     console.error("Failed to connect to jame:", error)
-    updateChatStore({ connectionState: "error" })
+    updateChatStore({
+      connectionState: "error",
+      errorDetail:
+        error instanceof Error && error.message.trim()
+          ? `${i18n.t("chat.connectionErrors.connectFailed")} ${error.message}`
+          : i18n.t("chat.connectionErrors.connectFailed"),
+    })
     isConnecting = false
     scheduleReconnect(generation, activeSessionIdRef)
   }
@@ -327,6 +341,9 @@ export async function hydrateActiveSession() {
 export function sendChatMessage(content: string) {
   if (!wsRef || wsRef.readyState !== WebSocket.OPEN) {
     console.warn("WebSocket not connected")
+    updateChatStore({
+      errorDetail: i18n.t("chat.connectionErrors.sendUnavailable"),
+    })
     return false
   }
 
@@ -338,6 +355,7 @@ export function sendChatMessage(content: string) {
       ...prev.messages,
       { id, role: "user", content, timestamp: Date.now() },
     ],
+    errorDetail: "",
     isTyping: true,
   }))
 
@@ -353,6 +371,10 @@ export function sendChatMessage(content: string) {
   } catch (error) {
     console.error("Failed to send jame message:", error)
     updateChatStore((prev) => ({
+      errorDetail:
+        error instanceof Error && error.message.trim()
+          ? `${i18n.t("chat.connectionErrors.sendFailed")} ${error.message}`
+          : i18n.t("chat.connectionErrors.sendFailed"),
       messages: prev.messages.filter((message) => message.id !== id),
       isTyping: false,
     }))

@@ -40,6 +40,7 @@ export function handleJameMessage(
           },
         ],
         isTyping: false,
+        errorDetail: "",
       }))
       break
     }
@@ -60,7 +61,7 @@ export function handleJameMessage(
     }
 
     case "typing.start":
-      updateChatStore({ isTyping: true })
+      updateChatStore({ isTyping: true, errorDetail: "" })
       break
 
     case "typing.stop":
@@ -69,7 +70,13 @@ export function handleJameMessage(
 
     case "error":
       console.error("Jame error:", payload)
-      updateChatStore({ isTyping: false })
+      updateChatStore({
+        isTyping: false,
+        errorDetail:
+          (payload.message as string) ||
+          (payload.error as string) ||
+          "The model returned an error while processing your request.",
+      })
       break
 
     case "pong":

@@ -26,6 +26,7 @@ export function ChatPage() {
   const {
     messages,
     connectionState,
+    errorDetail,
     isTyping,
     activeSessionId,
     sendMessage,
@@ -179,6 +180,7 @@ export function ChatPage() {
         isConnected={isChatConnected}
         hasDefaultModel={Boolean(defaultModelName)}
         blockedReason={blockedReason}
+        errorDetail={errorDetail}
       />
     </div>
   )

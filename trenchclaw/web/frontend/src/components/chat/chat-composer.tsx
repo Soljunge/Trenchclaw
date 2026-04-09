@@ -13,6 +13,7 @@ interface ChatComposerProps {
   isConnected: boolean
   hasDefaultModel: boolean
   blockedReason?: string
+  errorDetail?: string
 }
 
 export function ChatComposer({
@@ -22,6 +23,7 @@ export function ChatComposer({
   isConnected,
   hasDefaultModel,
   blockedReason,
+  errorDetail,
 }: ChatComposerProps) {
   const { t } = useTranslation()
   const canInput = isConnected && hasDefaultModel
@@ -53,7 +55,7 @@ export function ChatComposer({
 
         <div className="mt-2 flex items-center justify-between px-1">
           <div className="text-muted-foreground min-h-5 text-xs">
-            {!canInput ? blockedReason : ""}
+            {!canInput ? blockedReason : errorDetail}
           </div>
 
           <Button
