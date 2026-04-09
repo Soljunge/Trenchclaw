@@ -3,6 +3,7 @@ package api
 import (
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/sipeed/trenchlaw/web/backend/launcherconfig"
 )
@@ -10,6 +11,7 @@ import (
 // Handler serves HTTP API requests.
 type Handler struct {
 	configPath           string
+	startTime            time.Time
 	serverPort           int
 	serverPublic         bool
 	serverPublicExplicit bool
@@ -23,6 +25,7 @@ type Handler struct {
 func NewHandler(configPath string) *Handler {
 	return &Handler{
 		configPath: configPath,
+		startTime:  time.Now(),
 		serverPort: launcherconfig.DefaultPort,
 		oauthFlows: make(map[string]*oauthFlow),
 		oauthState: make(map[string]string),
@@ -40,6 +43,7 @@ func (h *Handler) SetServerOptions(port int, public bool, publicExplicit bool, a
 // RegisterRoutes binds all API endpoint handlers to the ServeMux.
 func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 	// Config CRUD
+	h.registerStatusRoutes(mux)
 	h.registerConfigRoutes(mux)
 
 	// Jame Channel (WebSocket chat)

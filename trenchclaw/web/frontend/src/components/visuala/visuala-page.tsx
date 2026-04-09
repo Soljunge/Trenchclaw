@@ -119,16 +119,17 @@ export function VisualaPage() {
 
           {showSummary ? (
           <Card className="border border-border/60" size="sm">
-            <CardHeader>
-              <CardTitle>{t("pages.agent.visuala.hero_title")}</CardTitle>
+            <CardHeader className="flex flex-row items-start justify-between gap-4">
+              <div>
+                <CardTitle>{t("pages.agent.visuala.hero_title")}</CardTitle>
+              </div>
+              <AgentIconDisplay
+                title={t("pages.agent.visuala.agent_icon.title")}
+                imageAlt={t("pages.agent.visuala.agent_icon.alt")}
+              />
             </CardHeader>
             <CardContent>
-              <div className="grid gap-3 md:grid-cols-[minmax(0,1.2fr)_repeat(5,minmax(0,1fr))]">
-                <AgentIconCard
-                  title={t("pages.agent.visuala.agent_icon.title")}
-                  subtitle={t("pages.agent.visuala.agent_icon.subtitle")}
-                  imageAlt={t("pages.agent.visuala.agent_icon.alt")}
-                />
+              <div className="grid gap-3 md:grid-cols-5">
                 <SimpleBox
                   label={t("pages.agent.visuala.metrics.gateway")}
                   value={t(`pages.agent.visuala.gateway_state.${state}`)}
@@ -285,39 +286,34 @@ function ToggleRow({
   )
 }
 
-function AgentIconCard({
+function AgentIconDisplay({
   title,
-  subtitle,
   imageAlt,
 }: {
   title: string
-  subtitle: string
   imageAlt: string
 }) {
   const [imageFailed, setImageFailed] = useState(false)
 
   return (
-    <div className="border border-border px-3 py-3 md:row-span-1">
-      <div className="flex items-center gap-3">
-        <div className="from-amber-100 via-orange-50 to-white flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-orange-200 bg-gradient-to-br shadow-[0_10px_30px_-18px_rgba(194,65,12,0.7)]">
-          {imageFailed ? (
-            <span className="text-2xl">🪖</span>
-          ) : (
-            <img
-              src={agentAvatarUrl}
-              alt={imageAlt}
-              className="size-full object-cover"
-              onError={() => setImageFailed(true)}
-            />
-          )}
+    <div className="flex shrink-0 items-center gap-3 rounded-2xl border border-orange-200/70 bg-orange-50/60 px-3 py-2">
+      <div className="from-amber-100 via-orange-50 to-white flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-orange-200 bg-gradient-to-br shadow-[0_10px_30px_-18px_rgba(194,65,12,0.7)]">
+        {imageFailed ? (
+          <span className="text-2xl">🪖</span>
+        ) : (
+          <img
+            src={agentAvatarUrl}
+            alt={imageAlt}
+            className="size-full object-cover"
+            onError={() => setImageFailed(true)}
+          />
+        )}
+      </div>
+      <div className="hidden min-w-0 sm:block">
+        <div className="text-[11px] uppercase tracking-[0.18em] text-orange-700">
+          {title}
         </div>
-        <div className="min-w-0">
-          <div className="text-[11px] uppercase tracking-[0.18em] text-orange-700">
-            {title}
-          </div>
-          <div className="mt-2 text-base font-medium">TrenchClaw</div>
-          <div className="text-muted-foreground mt-1 text-xs">{subtitle}</div>
-        </div>
+        <div className="mt-1 text-sm font-medium">TrenchClaw</div>
       </div>
     </div>
   )

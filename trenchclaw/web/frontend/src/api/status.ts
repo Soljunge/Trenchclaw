@@ -2,6 +2,10 @@ export interface AppStatusResponse {
   status: string
   version: string
   uptime: string
+  git_commit?: string
+  repo_head_commit?: string
+  update_available?: boolean
+  update_message?: string
 }
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {

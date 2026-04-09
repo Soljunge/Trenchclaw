@@ -270,6 +270,21 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               ? `CT version ${appStatus.version}`
               : "CT version 001"}
           </p>
+          {appStatus?.update_available ? (
+            <div className="mt-2 rounded-md border border-amber-300/60 bg-amber-500/10 px-2 py-1.5 text-[11px] leading-4 text-amber-200">
+              <div className="font-semibold tracking-[0.12em] uppercase">
+                Update Available
+              </div>
+              <div className="mt-1">
+                {appStatus.update_message || "Local git HEAD is newer than this running build."}
+              </div>
+              {appStatus.repo_head_commit ? (
+                <div className="mt-1 font-mono text-[10px] text-amber-100/90">
+                  HEAD {appStatus.repo_head_commit}
+                </div>
+              ) : null}
+            </div>
+          ) : null}
         </div>
       </SidebarFooter>
       <SidebarRail />
