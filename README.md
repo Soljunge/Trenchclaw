@@ -34,6 +34,8 @@ This repository contains the TrenchClaw project workspace and the agent core in 
 
 ## Quick Start
 
+The shortest path is: build once, run onboarding once, set a default model, then use `trenchclaw`.
+
 ### 1. Build the CLI
 
 From the repository root:
@@ -43,23 +45,21 @@ cd trenchclaw
 go build -o trenchclaw ./cmd/trenchlaw
 ```
 
-### 2. Run first-time setup
+### 2. Run onboarding
 
 ```bash
 ./trenchclaw onboard
 ```
 
-`onboard` initializes the local config and workspace. It is also available as:
+This creates the local config and workspace files. `install` is an alias:
 
 ```bash
 ./trenchclaw install
 ```
 
-### 3. Add a model provider
+### 3. Set a default model
 
-You can authenticate and configure a default model in the setup flow, or do it manually later.
-
-Examples:
+You can do this during onboarding or later with the CLI:
 
 ```bash
 ./trenchclaw auth login
@@ -68,7 +68,7 @@ Examples:
 ./trenchclaw model gpt-5.4
 ```
 
-The project uses a `model_list` configuration, so you can add providers with entries like:
+If you prefer editing config directly, add a model entry such as:
 
 ```json
 {
@@ -78,55 +78,61 @@ The project uses a `model_list` configuration, so you can add providers with ent
 }
 ```
 
-Supported provider families include OpenAI, Anthropic, OpenRouter, Gemini, Groq, DeepSeek, Ollama, VLLM, Azure OpenAI, GitHub Copilot, and others documented in [`trenchclaw/docs/providers.md`](./trenchclaw/docs/providers.md).
+Provider setup details are in [`trenchclaw/docs/providers.md`](./trenchclaw/docs/providers.md).
 
-### 4. Start using the agent
+### 4. Start the agent
 
-Interactive mode:
+For normal use:
 
 ```bash
 ./trenchclaw
 ```
 
-Direct agent chat:
+If onboarding is complete, the interactive launcher lets you choose:
+
+- Terminal Agent
+- Web Console
+- TUI Dashboard
+
+If you want the terminal agent directly:
 
 ```bash
 ./trenchclaw agent
 ./trenchclaw agent -m "Summarize the repository and suggest next steps"
 ```
 
-Status and version:
+Useful checks:
 
 ```bash
 ./trenchclaw status
 ./trenchclaw version
 ```
 
-## Main Commands
+## Most Used Commands
 
-Use these commands as your default operating surface:
+Use these first before exploring the rest of the CLI:
 
 ```bash
-./trenchclaw onboard
-./trenchclaw agent
-./trenchclaw auth login
-./trenchclaw auth status
-./trenchclaw model
-./trenchclaw gateway
-./trenchclaw skills list
-./trenchclaw cron list
-./trenchclaw status
+./trenchclaw onboard      # first-time setup
+./trenchclaw              # launcher: agent, web, or tui
+./trenchclaw agent        # terminal agent directly
+./trenchclaw auth login   # connect a provider
+./trenchclaw model        # list or set the default model
+./trenchclaw status       # confirm config and runtime state
+./trenchclaw gateway      # run integrations and long-lived channels
+./trenchclaw skills list  # inspect installed skills
+./trenchclaw cron list    # inspect scheduled jobs
 ```
 
 ## Interfaces
 
-When you run `trenchclaw` interactively, the CLI can route you into one of three entry points:
+`trenchclaw` is the default entry point.
 
-- Terminal Agent: direct chat and task execution in the terminal
-- Web Console: browser-based dashboard
-- TUI Dashboard: terminal UI dashboard
+- `trenchclaw`: opens the startup selector in an interactive terminal
+- `trenchclaw agent`: skips the selector and starts terminal chat
+- `trenchclaw gateway`: runs the always-on gateway for channels and automations
 
-If setup is incomplete, the CLI redirects you to onboarding first.
+If setup is incomplete, `trenchclaw` sends you to onboarding first. If no default model is configured, `trenchclaw agent` tells you to finish setup or choose a model.
 
 ## Channel Integrations
 

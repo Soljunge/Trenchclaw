@@ -9,7 +9,21 @@ For the main project overview and quick start, go to [the repository README](../
 ```bash
 go build -o trenchclaw ./cmd/trenchlaw
 ./trenchclaw onboard
+./trenchclaw
+```
+
+If you want the terminal agent directly, use:
+
+```bash
 ./trenchclaw agent
+```
+
+Typical first-run flow:
+
+```bash
+./trenchclaw auth login
+./trenchclaw model
+./trenchclaw status
 ```
 
 ## Core Features
