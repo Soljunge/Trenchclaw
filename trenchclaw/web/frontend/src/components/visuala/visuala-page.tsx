@@ -54,6 +54,7 @@ export function VisualaPage() {
 
   const metrics = summarizeLogs(logs, state)
   const providerLabel = describeProvider(defaultModel)
+  const activeFlowStep = resolveActiveFlowStep(metrics)
 
   useEffect(() => {
     const handleToggle = () => {
@@ -161,41 +162,53 @@ export function VisualaPage() {
           ) : null}
 
           {showFlow || showTimeline ? (
-            <div
-              className={cn(
-                "grid gap-6",
-                showFlow && showTimeline
-                  ? "lg:grid-cols-[220px_minmax(0,1fr)]"
-                  : "lg:grid-cols-1",
-              )}
-            >
+            <div className="flex flex-col gap-6">
               {showFlow ? (
-                <div className="space-y-4">
-                  <div className="grid gap-3 lg:grid-cols-[1fr_40px_1fr_40px_1fr] lg:items-center">
-                    <SimpleFlowBox
-                      title={t("pages.agent.visuala.now_title")}
-                      value={t(`pages.agent.visuala.phase.${metrics.phase}`)}
-                      tone={metrics.phaseTone}
-                    />
-                    <FlowConnector />
-                    <SimpleFlowBox
-                      title={t("pages.agent.visuala.flow.new_agent")}
-                      value={providerLabel}
-                      tone="tool"
-                    />
-                    <FlowConnector />
-                    <SimpleFlowBox
-                      title={t("pages.agent.visuala.flow.memory_target")}
-                      value={metrics.memoryTarget}
-                      tone="io"
-                    />
-                  </div>
-                  <SimpleFlowBox
-                    title={t("pages.agent.visuala.cards.io")}
-                    value={String(metrics.ioCount)}
-                    tone="io"
-                  />
-                </div>
+                <Card className="border border-border/60" size="sm">
+                  <CardHeader>
+                    <CardTitle>{t("pages.agent.visuala.flow.title")}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid gap-3 lg:grid-cols-[1fr_56px_1fr_56px_1fr] lg:items-center">
+                      <FlowStage
+                        label={t("pages.agent.visuala.flow.step_focus")}
+                        title={t("pages.agent.visuala.now_title")}
+                        value={t(`pages.agent.visuala.phase.${metrics.phase}`)}
+                        tone={metrics.phaseTone}
+                        active={activeFlowStep === "focus"}
+                      />
+                      <FlowConnector />
+                      <FlowStage
+                        label={t("pages.agent.visuala.flow.step_agent")}
+                        title={t("pages.agent.visuala.flow.new_agent")}
+                        value={providerLabel}
+                        tone="tool"
+                        active={activeFlowStep === "agent"}
+                      />
+                      <FlowConnector />
+                      <FlowStage
+                        label={t("pages.agent.visuala.flow.step_memory")}
+                        title={t("pages.agent.visuala.flow.memory_target")}
+                        value={metrics.memoryTarget}
+                        tone="io"
+                        active={activeFlowStep === "memory"}
+                      />
+                    </div>
+
+                    <div className="grid gap-3 md:grid-cols-2">
+                      <SimpleFlowBox
+                        title={t("pages.agent.visuala.cards.io")}
+                        value={String(metrics.ioCount)}
+                        tone="io"
+                      />
+                      <SimpleFlowBox
+                        title={t("pages.agent.visuala.flow.activity")}
+                        value={metrics.summary}
+                        tone="idle"
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
               ) : null}
 
               {showTimeline ? (
@@ -300,10 +313,39 @@ function SimpleFlowBox({
   )
 }
 
+function FlowStage({
+  label,
+  title,
+  value,
+  tone,
+  active,
+}: {
+  label: string
+  title: string
+  value: string
+  tone: ActivityTone
+  active: boolean
+}) {
+  return (
+    <div className="space-y-2">
+      <div className="text-muted-foreground flex items-center justify-center gap-2 text-center text-[11px] font-medium uppercase tracking-[0.18em]">
+        {active ? (
+          <span className="size-3 rounded-full border-2 border-current border-t-transparent animate-spin" />
+        ) : (
+          <span className="bg-border size-2 rounded-full" />
+        )}
+        {label}
+      </div>
+      <SimpleFlowBox title={title} value={value} tone={tone} />
+    </div>
+  )
+}
+
 function FlowConnector() {
   return (
     <div className="hidden items-center justify-center lg:flex">
       <div className="bg-border h-px w-full" />
+      <div className="border-border bg-background -ml-2 size-2 rotate-45 border-r border-b" />
     </div>
   )
 }
@@ -527,4 +569,17 @@ function describeMemoryTarget(logs: string[]) {
   }
 
   return "Waiting for memory write"
+}
+
+function resolveActiveFlowStep(metrics: {
+  phase: "booting" | "thinking" | "acting" | "waiting"
+  memoryState: "active" | "saved" | "idle"
+}) {
+  if (metrics.memoryState === "active") {
+    return "memory"
+  }
+  if (metrics.phase === "acting" || metrics.phase === "booting") {
+    return "agent"
+  }
+  return "focus"
 }

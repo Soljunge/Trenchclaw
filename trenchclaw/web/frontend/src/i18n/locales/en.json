@@ -42,6 +42,10 @@
       "localModelUnavailable": "This local model is not reachable. Make sure the local model server is running and the configured localhost port is correct.",
       "apiModelUnavailable": "This model is not accessible right now. Check the API key, provider login, network connection, or model endpoint."
     },
+    "status": {
+      "stable": "Stable: {{value}}",
+      "metrics": "{{fps}} FPS · {{ms}} ms"
+    },
     "connectionErrors": {
       "noToken": "Chat could not start because the Jame token is missing or the channel is not configured.",
       "socketClosed": "The chat connection was closed. TrenchClaw is trying to reconnect.",
@@ -446,8 +450,13 @@
           "nothing_selected": "Nothing is selected. Turn on at least one section to show the view."
         },
         "flow": {
+          "title": "Flow map",
+          "activity": "Latest activity",
           "new_agent": "New Agent",
-          "memory_target": "Memory"
+          "memory_target": "Memory",
+          "step_focus": "Step 1",
+          "step_agent": "Step 2",
+          "step_memory": "Step 3"
         },
         "phase": {
           "booting": "Connecting",

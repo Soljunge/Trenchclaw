@@ -22,6 +22,7 @@ export function ChatPage() {
   const [isAtBottom, setIsAtBottom] = useState(true)
   const [hasScrolled, setHasScrolled] = useState(false)
   const [input, setInput] = useState("")
+  const [perfStats, setPerfStats] = useState({ fps: 0, frameMs: 0 })
 
   const {
     messages,
@@ -88,6 +89,35 @@ export function ChatPage() {
     }
   }, [messages, isTyping, isAtBottom])
 
+  useEffect(() => {
+    let frameId = 0
+    let lastTime = 0
+    const samples: number[] = []
+
+    const tick = (time: number) => {
+      if (lastTime > 0) {
+        const delta = time - lastTime
+        samples.push(delta)
+        if (samples.length > 30) {
+          samples.shift()
+        }
+        const avg =
+          samples.reduce((sum, value) => sum + value, 0) / samples.length
+        setPerfStats({
+          fps: avg > 0 ? Math.round(1000 / avg) : 0,
+          frameMs: Math.round(avg || 0),
+        })
+      }
+      lastTime = time
+      frameId = window.requestAnimationFrame(tick)
+    }
+
+    frameId = window.requestAnimationFrame(tick)
+    return () => window.cancelAnimationFrame(frameId)
+  }, [])
+
+  const isStable = isChatConnected && perfStats.fps >= 45 && perfStats.frameMs > 0
+
   const handleSend = () => {
     if (!input.trim() || !canSend) return
     if (sendMessage(input.trim())) {
@@ -103,15 +133,30 @@ export function ChatPage() {
           hasScrolled ? "shadow-sm" : "shadow-none"
         }`}
         titleExtra={
-          hasConfiguredModels && (
-            <ModelSelector
-              defaultModelName={defaultModelName}
-              apiKeyModels={apiKeyModels}
-              oauthModels={oauthModels}
-              localModels={localModels}
-              onValueChange={handleSetDefault}
-            />
-          )
+          <div className="flex items-center gap-3">
+            {hasConfiguredModels && (
+              <ModelSelector
+                defaultModelName={defaultModelName}
+                apiKeyModels={apiKeyModels}
+                oauthModels={oauthModels}
+                localModels={localModels}
+                onValueChange={handleSetDefault}
+              />
+            )}
+            <div className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-xs font-medium text-orange-900">
+              <span className="relative flex size-2 shrink-0">
+                <span className="absolute inline-flex size-full rounded-full bg-orange-500/35" />
+                <span className="relative inline-flex size-2 rounded-full bg-orange-500" />
+              </span>
+              <span>{t("chat.status.stable", { value: isStable ? "Yes" : "No" })}</span>
+              <span className="text-orange-700/80">
+                {t("chat.status.metrics", {
+                  fps: perfStats.fps,
+                  ms: perfStats.frameMs,
+                })}
+              </span>
+            </div>
+          </div>
         }
       >
         <Button
